@@ -1,56 +1,34 @@
-# PDF-Embedding-Pipeline-for-Financial-Docs (OCR-Based, Vector-Ready)
+# PDF-Embedding-Pipeline-for-Financial-Docs (OCR-Based, FastAPI + Streamlit)
 
-A powerful backend pipeline to extract both text and image content from PDF files (using OCR), and convert them into semantic vector embeddings using the BAAI `bge-base-en` model. Ideal for building AI-powered financial document search or QA systems.
+An AI-powered document processing pipeline that extracts text and OCR data from PDFs, generates embeddings using the BAAI `bge-base-en` model, and lets users interact with the backend via a clean Streamlit frontend. Perfect for RAG, financial QA, or search use cases.
 
 ---
 
 # 🚀 Features
 
-* 📄 Extracts paragraph text directly from PDF pages
-* 🖼️ Runs OCR on embedded PDF images using Tesseract
-* 🧠 Generates high-quality sentence embeddings with `bge-base-en`
-* 🗂️ Saves all extracted data and metadata into a `.pkl` file
-* 🧾 Embedding output is vector-db ready for search and retrieval
-* 💾 Modular structure to plug into FAISS, Chroma, or RAG apps
+* 📄 Upload and extract text from PDF documents via Streamlit UI
+* 🖼️ Automatically runs OCR on embedded images in PDFs
+* 🧠 Converts all text into semantic embeddings with `bge-base-en`
+* 🧾 Saves metadata-rich output in `.pkl` files for reuse
+* 🔁 Seamless FastAPI ↔ Streamlit communication
+* ⚡ Fully modular to integrate into vector databases like FAISS/Chroma
+* 🌐 CORS enabled for safe frontend-backend interaction
+* 🐳 (Optional) Easily containerized with Docker
 
 ---
 
-| Layer           | Technology              |
-| --------------- | ----------------------- |
-| PDF Parser      | PyMuPDF (`fitz`)        |
-| OCR Engine      | `pytesseract`           |
-| Image Handling  | `PIL`                   |
-| Embedding Model | BAAI `bge-base-en`      |
-| Data Handling   | `pandas`, `pickle`      |
-| Vector Ready    | Any FAISS / Chroma etc. |
-| Runtime         | Python                  |
+| Layer            | Technology          |
+| ---------------- | ------------------- |
+| Frontend         | Streamlit           |
+| Backend          | FastAPI             |
+| PDF Parser       | PyMuPDF (`fitz`)    |
+| OCR Engine       | `pytesseract`       |
+| Embedding Model  | BAAI `bge-base-en`  |
+| Image Handling   | `PIL`               |
+| Vector Support   | FAISS, Chroma-ready |
+| Containerization | Docker (optional)   |
 
 ---
-
-# 🔧 Local Setup
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/your-username/pdf-embedding-pipeline.git
-cd pdf-embedding-pipeline
-```
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
 # 🗂️ Project Structure
 
 ```
@@ -60,12 +38,33 @@ financial-chatbot/
 │   ├── pdfs/                 # ← Input PDFs
 │   ├── processed_texts.pkl   # ← Extracted text with metadata
 │   └── embeddings.pkl        # ← Final vector embeddings
+├── scripts/
+│   ├── create_embeddings.py  # ← Embeds the extracted text
+│   └── extract_text.py       # ← Extracts paragraph and OCR text
 │
-├── extract_text.py           # ← OCR & paragraph extractor
-├── create_embeddings.py      # ← Embedding generator
-├── requirements.txt
-└── README.md
+├── app/
+│   ├── app.py
+│   └── main.py
+
+---
+
+# ▶️ How to Run
+
+### 🖥️ Terminal 1 — Start FastAPI Backend
+
+```bash
+uvicorn main:app --reload
 ```
+
+* Visit the API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### 🧑‍💻 Terminal 2 — Start Streamlit Frontend
+
+```bash
+streamlit run app.py
+```
+
+* Visit the UI: [http://localhost:8501](http://localhost:8501)
 
 ---
 
@@ -74,37 +73,41 @@ financial-chatbot/
 * **BAAI/bge-base-en**
 
   * HuggingFace sentence embedding model
-  * Great for document similarity, RAG, search, and QA tasks
-  * [🔗 Model Link](https://huggingface.co/BAAI/bge-base-en)
+  * Optimized for document similarity, search, and RAG pipelines
+  * [🔗 Model Card](https://huggingface.co/BAAI/bge-base-en)
 
 ---
 
 # 📌 Flow Summary
 
-1. 🗂️ Drop PDFs into the `data/pdfs/` folder
-2. 🧾 Run `extract_text.py` to get all paragraph + OCR text
-3. 🧠 Run `create_embeddings.py` to convert extracted data into embeddings
-4. 📦 Use `embeddings.pkl` to load into a vector DB (FAISS, Pinecone, Chroma, etc.)
+1. 📤 Upload PDF via Streamlit UI
+2. ⚙️ FastAPI receives and processes:
+
+   * Paragraph text from PDF
+   * OCR from images
+3. 🧠 `create_embeddings.py` converts extracted text into vector embeddings
+4. 🗂️ Results stored in `.pkl` files
+5. 🔍 Embeddings can now be queried, searched, or plugged into RAG pipelines
 
 ---
 
-# 📌 To Extend With New PDFs
+# 🧩 Add New PDFs Later
 
-Just add your new `.pdf` files into `data/pdfs/` and re-run:
+To extend the project with new files:
+
+1. Add PDFs into `data/pdfs/`
+2. Re-run:
 
 ```bash
 python extract_text.py
 python create_embeddings.py
 ```
 
-This will regenerate the `.pkl` files with **all PDFs processed**, including the newly added ones.
-
 ---
 
-# 📜 License
+# 🔐 API / Security
 
-MIT License
+* Uses CORS middleware to allow interaction between Streamlit and FastAPI
+* No OpenAI key needed (fully local embedding model)
 
 ---
-
-Would you like me to push this to a GitHub Gist or generate a Markdown file for direct use?
