@@ -108,6 +108,5 @@ python create_embeddings.py
 # 🔐 API / Security
 
 * Uses CORS middleware to allow interaction between Streamlit and FastAPI
-* No OpenAI key needed (fully local embedding model)
 
 ---
